@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Ferrari V12 – Ultimate Experience</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+    margin:0;
+    background:linear-gradient(180deg, #000 0%, #111 100%);
+    color:#fff;
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    overflow:hidden;
+    position:relative;
+}
+body::before{
+    content:'';
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    background:radial-gradient(circle at 50% 50%, rgba(255,40,0,0.1) 0%, transparent 50%);
+    pointer-events:none;
+}
+.container{
+    width:100%;
+    max-width:480px;
+    text-align:center;
+    padding:20px;
+    position:relative;
+    z-index:1;
+}
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+.logo{
+    color:#ff2800;
+    font-size:2.4rem;
+    font-weight:900;
+    letter-spacing:3px;
+    text-shadow:0 0 20px rgba(255,40,0,0.5);
+}
+.model{
+    font-size:1.2rem;
+    color:#ff2800;
+    font-weight:700;
+    letter-spacing:1px;
+}
+.sub{
+    color:#aaa;
+    margin-bottom:30px;
+    font-size:0.9rem;
+    letter-spacing:1px;
+}
+.rpm-container{
+    margin:30px 0;
+}
+.rpm-display{
+    display:flex;
+    justify-content:center;
+    align-items:baseline;
+    margin-bottom:15px;
+}
+.rpm{
+    font-size:4rem;
+    font-weight:900;
+    color:#ff2800;
+    font-family:monospace;
+    text-shadow:0 0 10px rgba(255,40,0,0.3);
+}
+.rpm-unit{
+    font-size:1.5rem;
+    color:#666;
+    margin-left:10px;
+}
+.gear-display{
+    font-size:2.5rem;
+    color:#ffaa00;
+    font-weight:900;
+    margin:20px 0;
+    text-shadow:0 0 15px rgba(255,170,0,0.4);
+}
+.tachometer{
+    height:180px;
+    position:relative;
+    margin:40px 0;
+}
+.needle{
+    position:absolute;
+    left:50%;
+    bottom:0;
+    width:4px;
+    height:90px;
+    background:linear-gradient(to top, #ff2800, #ff5500);
+    transform-origin:bottom center;
+    transform:translateX(-50%) rotate(-135deg);
+    border-radius:2px;
+    transition:transform 0.05s ease-out;
+    box-shadow:0 0 10px rgba(255,40,0,0.5);
+    z-index:2;
+}
+.ticks{
+    position:absolute;
+    top:0;
+    left:50%;
+    transform:translateX(-50%);
+    width:200px;
+    height:100px;
+    border:3px solid #333;
+    border-radius:200px 200px 0 0;
+    overflow:hidden;
+}
+.tick{
+    position:absolute;
+    bottom:0;
+    left:50%;
+    width:2px;
+    height:15px;
+    background:#666;
+    transform-origin:bottom center;
+}
+.redzone{
+    position:absolute;
+    top:0;
+    right:0;
+    width:40px;
+    height:100px;
+    background:linear-gradient(90deg, transparent, rgba(255,40,0,0.3));
+    border-radius:0 200px 0 0;
+}
+.bar-wrap{
+    height:22px;
+    background:#222;
+    border-radius:20px;
+    overflow:hidden;
+    border:1px solid #333;
+    margin:20px 0;
+}
+.bar{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#ff2800,#ffaa00);
+    transition:width 0.05s linear;
+}
+.controls{
+    margin:30px 0;
+}
+button{
+    width:200px;
+    height:200px;
+    margin:0 auto;
+    border-radius:50%;
+    border:none;
+    background:radial-gradient(circle at 30% 30%, #222, #000);
+    color:#fff;
+    font-size:1.6rem;
+    font-weight:900;
+    box-shadow:0 20px 40px rgba(0,0,0,0.9), 
+                inset 0 0 30px rgba(0,0,0,0.8),
+                0 0 30px rgba(255,40,0,0.2);
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    transition:all 0.1s;
+}
+button::after{
+    content:'';
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    border-radius:50%;
+    box-shadow:inset 0 0 50px rgba(255,255,255,0.1);
+    pointer-events:none;
+}
+button:active{
+    transform:scale(0.97);
+    box-shadow:0 10px 20px rgba(0,0,0,0.9), 
+                inset 0 0 30px rgba(0,0,0,0.8),
+                0 0 50px rgba(255,40,0,0.4);
+}
+.status{
+    color:#ff2800;
+    font-size:1.1rem;
+    font-weight:700;
+    margin:15px 0;
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+.stats{
+    display:flex;
+    justify-content:space-around;
+    margin:25px 0;
+    color:#aaa;
+    font-size:0.9rem;
+}
+.stat{
+    text-align:center;
+}
+.stat-value{
+    color:#ffaa00;
+    font-size:1.2rem;
+    font-weight:700;
+    margin-bottom:5px;
+}
+.hint{
+    color:#666;
+    font-size:0.8rem;
+    margin-top:10px;
+}
+.shake{animation:shake .12s infinite}
+@keyframes shake{
+    0%{transform:translate(0,0)}
+    25%{transform:translate(2px,-1px)}
+    50%{transform:translate(-2px,1px)}
+    75%{transform:translate(1px,2px)}
+    100%{transform:translate(0,0)}
+}
+.exhaust-pulse{
+    position:absolute;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:20px;
+    opacity:0;
+    transition:opacity 0.3s;
+}
+.exhaust{
+    width:15px;
+    height:15px;
+    background:radial-gradient(circle, #ff5500, transparent);
+    border-radius:50%;
+    animation:exhaust 1s infinite alternate;
+}
+.exhaust:nth-child(2){
+    animation-delay:0.3s;
+}
+@keyframes exhaust{
+    0%{transform:scale(0.5); opacity:0.3}
+    100%{transform:scale(2); opacity:0}
+}
+.ignition-flash{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    background:white;
+    opacity:0;
+    pointer-events:none;
+    z-index:1000;
+}
+.overrev{
+    animation:overrev 0.15s infinite;
+}
+@keyframes overrev{
+    0%{filter:hue-rotate(0deg) brightness(1)}
+    50%{filter:hue-rotate(20deg) brightness(1.5)}
+    100%{filter:hue-rotate(0deg) brightness(1)}
+}
+</style>
+</head>
+<body>
+
+<div class="container" id="ui">
+    <div class="header">
+        <div class="logo">FERRARI</div>
+        <div class="model">812 SUPERFAST</div>
+    </div>
+    <div class="sub">V12 ENGINE · 6.5L · 789 HP</div>
+
+    <div class="rpm-container">
+        <div class="rpm-display">
+            <div class="rpm" id="rpmText">0</div>
+            <div class="rpm-unit">RPM</div>
+        </div>
+        <div class="gear-display" id="gearText">N</div>
+    </div>
+
+    <div class="tachometer">
+        <div class="ticks" id="ticks"></div>
+        <div class="redzone"></div>
+        <div class="needle" id="needle"></div>
+    </div>
+
+    <div class="bar-wrap">
+        <div class="bar" id="rpmBar"></div>
+    </div>
+
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-value" id="speed">0</div>
+            <div>KM/H</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value" id="temp">85</div>
+            <div>°C</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value" id="lap">1.3</div>
+            <div>0-100 KM/H</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="btn">START ENGINE</button>
+    </div>
+
+    <div class="status" id="status">ENGINE OFF</div>
+    <div class="hint">Hold to rev · Release for idle · Shift: 1-6</div>
+    
+    <div class="exhaust-pulse" id="exhaust">
+        <div class="exhaust"></div>
+        <div class="exhaust"></div>
+    </div>
+</div>
+
+<div class="ignition-flash" id="ignitionFlash"></div>
+
+<script>
+/* ---------- CONSTANTS ---------- */
+const MAX_RPM = 9500;
+const REDLINE_RPM = 8900;
+const IDLE_RPM = 850;
+const GEAR_RATIOS = [3.27, 2.13, 1.72, 1.39, 1.16, 1.00];
+let currentGear = 0; // 0 = neutral
+
+/* ---------- STATE ---------- */
+let rpm = 0;
+let targetRpm = 0;
+let running = false;
+let isOverRev = false;
+let engineTemp = 85;
+let speed = 0;
+let isRevving = false;
+
+/* ---------- AUDIO ---------- */
+const ctx = new (window.AudioContext||window.webkitAudioContext)();
+const masterGain = ctx.createGain();
+masterGain.gain.value = 0;
+masterGain.connect(ctx.destination);
+
+const filter = ctx.createBiquadFilter();
+filter.type = "lowpass";
+filter.frequency.value = 2000;
+filter.Q.value = 1;
+filter.connect(masterGain);
+
+/* ---------- ENGINE SOUND LAYERS ---------- */
+// Primary V12 sound
+const primaryOscs = [];
+for(let i=0;i<12;i++){
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sawtooth";
+    osc.frequency.value = 60;
+    gain.gain.value = 0;
+    osc.connect(gain).connect(filter);
+    osc.start();
+    primaryOscs.push({osc,gain,phase:i/12});
+}
+
+// Secondary harmonics
+const harmonicOscs = [];
+for(let i=0;i<4;i++){
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "triangle";
+    osc.frequency.value = 120;
+    gain.gain.value = 0;
+    osc.connect(gain).connect(filter);
+    osc.start();
+    harmonicOscs.push({osc,gain,phase:i/4});
+}
+
+// Intake noise
+const noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+const ndata = noiseBuf.getChannelData(0);
+for(let i=0;i<ndata.length;i++) ndata[i]=(Math.random()*2-1)*0.2;
+
+const noise = ctx.createBufferSource();
+noise.buffer = noiseBuf;
+noise.loop = true;
+const noiseGain = ctx.createGain();
+noiseGain.gain.value = 0.01;
+noise.connect(noiseGain).connect(filter);
+noise.start();
+
+// Exhaust resonance
+const exhaustFilter = ctx.createBiquadFilter();
+exhaustFilter.type = "bandpass";
+exhaustFilter.frequency.value = 120;
+exhaustFilter.Q.value = 5;
+exhaustFilter.connect(masterGain);
+
+const exhaustOsc = ctx.createOscillator();
+const exhaustGain = ctx.createGain();
+exhaustOsc.type = "sine";
+exhaustOsc.frequency.value = 60;
+exhaustGain.gain.value = 0;
+exhaustOsc.connect(exhaustGain).connect(exhaustFilter);
+exhaustOsc.start();
+
+/* ---------- UI ELEMENTS ---------- */
+const ui = document.getElementById('ui');
+const btn = document.getElementById('btn');
+const rpmText = document.getElementById('rpmText');
+const rpmBar = document.getElementById('rpmBar');
+const status = document.getElementById('status');
+const gearText = document.getElementById('gearText');
+const speedText = document.getElementById('speed');
+const tempText = document.getElementById('temp');
+const needle = document.getElementById('needle');
+const exhaust = document.getElementById('exhaust');
+const ignitionFlash = document.getElementById('ignitionFlash');
+const ticks = document.getElementById('ticks');
+/* ---------- TACHOMETER TICKS ---------- */
+for(let i=0;i<=9000;i+=500){
+    const tick = document.createElement('div');
+    tick.className = 'tick';
+    const angle = (i/9000)*180 - 90;
+    tick.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+    tick.style.height = i % 1000 === 0 ? '20px' : '10px';
+    tick.style.background = i >= 8000 ? '#ff2800' : '#666';
+    ticks.appendChild(tick);
+}
+
+/* ---------- ENGINE LOOP ---------- */
+function engineLoop(){
+    if(!running) return;
+
+    // Smooth RPM interpolation
+    rpm += (targetRpm - rpm) * 0.08;
+    
+    // Engine braking when not revving
+    if(!isRevving && rpm > IDLE_RPM){
+        targetRpm -= 50;
+    }
+
+    // Over-rev protection with chaos
+    if(rpm > REDLINE_RPM){
+        isOverRev = true;
+        ui.classList.add('overrev');
+        if(rpm > MAX_RPM){
+            targetRpm = REDLINE_RPM - 1000;
+            // Add misfire effect
+            masterGain.gain.value *= 0.7;
+            setTimeout(() => {
+                masterGain.gain.value = 0.25 + (rpm/MAX_RPM)*0.75;
+            }, 100);
+        }
+    } else {
+        isOverRev = false;
+        ui.classList.remove('overrev');
+    }
+
+    // Calculate engine parameters
+    const ratio = rpm / MAX_RPM;
+    const crankHz = (rpm/60)*6;
+    const loadFactor = Math.min(1, rpm/5000);
+
+    // Update primary oscillators
+    primaryOscs.forEach((osc, i) => {
+        const pulse = Math.sin(ctx.currentTime * crankHz * 2 * Math.PI + osc.phase * 2 * Math.PI);
+        const fire = Math.max(0, pulse) * (0.8 + Math.random()*0.4);
+        osc.osc.frequency.value = 45 + ratio*350;
+        osc.gain.gain.value = fire * (0.03 + ratio*0.12);
+    });
+
+    // Update harmonics
+    harmonicOscs.forEach((osc, i) => {
+        osc.osc.frequency.value = (45 + ratio*350) * (i+2);
+        osc.gain.gain.value = ratio * 0.05 * (1 - i*0.2);
+    });
+
+    // Update exhaust resonance
+    exhaustOsc.frequency.value = crankHz / 2;
+    exhaustGain.gain.value = ratio * 0.1;
+
+    // Update filters
+    filter.frequency.value = 1800 + ratio*6000 - (ratio*ratio*2000);
+    exhaustFilter.frequency.value = 80 + ratio*400;
+    exhaustFilter.Q.value = 3 + ratio*10;
+
+    // Update noise
+    noiseGain.gain.value = 0.01 + ratio*0.1 + Math.random()*0.02;
+
+    // Master volume
+    masterGain.gain.value = 0.2 + ratio*0.8;
+
+    // Update UI
+    updateUI(ratio);
+    
+    // Continue loop
+    requestAnimationFrame(engineLoop);
+}
+
+/* ---------- UI UPDATE ---------- */
+function updateUI(ratio){
+    rpmText.textContent = Math.round(rpm);
+    rpmBar.style.width = (ratio*100) + "%";
+    
+    // Calculate speed based on gear and RPM
+    if(currentGear > 0){
+        speed = Math.round((rpm * 0.03 * GEAR_RATIOS[currentGear-1]));
+    } else {
+        speed = 0;
+    }
+    speedText.textContent = speed;
+    
+    // Update temperature
+    engineTemp = 85 + (rpm/1000)*5 + (isOverRev ? 20 : 0);
+    tempText.textContent = Math.round(engineTemp);
+    
+    // Update needle
+    const needleAngle = (rpm/MAX_RPM)*270 - 135;
+    needle.style.transform = `translateX(-50%) rotate(${needleAngle}deg)`;
+    
+    // Exhaust pulse
+    exhaust.style.opacity = rpm > 3000 ? '1' : '0';
+    
+    // Vibration
+    if(navigator.vibrate && rpm > 2000){
+        const intensity = Math.min(100, (rpm-2000)/50);
+        navigator.vibrate([intensity, intensity/2]);
+    }
+    
+    // UI shake
+    ui.classList.toggle("shake", rpm > 2500);
+}
+
+/* ---------- IGNITION SEQUENCE ---------- */
+async function startEngine(){
+    if(running) return;
+    
+    await ctx.resume();
+    
+    // Ignition flash
+    ignitionFlash.style.opacity = '1';
+    setTimeout(() => {
+        ignitionFlash.style.opacity = '0';
+    }, 200);
+    
+    // Start sound
+    masterGain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.5);
+    
+    running = true;
+    currentGear = 0;
+    gearText.textContent = 'N';
+    targetRpm = IDLE_RPM;
+    btn.textContent = "STOP ENGINE";
+    status.textContent = "ENGINE RUNNING";
+    
+    setTimeout(() => {
+        engineLoop();
+    }, 300);
+}
+
+function stopEngine(){
+    running = false;
+    targetRpm = 0;
+    masterGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5);
+    btn.textContent = "START ENGINE";
+    status.textContent = "ENGINE OFF";
+    gearText.textContent = 'N';
+    currentGear = 0;
+    ui.classList.remove("shake", "overrev");
+    if(navigator.vibrate) navigator.vibrate(0);
+}
+
+/* ---------- CONTROLS ---------- */
+btn.onclick = async ()=>{
+    if(!running){
+        await startEngine();
+    }else{
+        stopEngine();
+    }
+};
+
+// Hold to rev
+["mousedown","touchstart"].forEach(e=>{
+    document.body.addEventListener(e,()=>{ 
+        if(running){
+            targetRpm = MAX_RPM;
+            isRevving = true;
+        }
+    });
+});
+["mouseup","touchend","mouseleave"].forEach(e=>{
+    document.body.addEventListener(e,()=>{ 
+        if(running){
+            targetRpm = IDLE_RPM;
+            isRevving = false;
+        }
+    });
+});
+
+// Gear shift with keyboard
+document.addEventListener('keydown', (e) => {
+    if(!running) return;
+    
+    if(e.key >= '1' && e.key <= '6'){
+        currentGear = parseInt(e.key);
+        gearText.textContent = currentGear;
+        // RPM drop on upshift
+        if(targetRpm > IDLE_RPM){
+            targetRpm *= 0.7;
+        }
+    } else if(e.key === '0' || e.key === 'N'){
+        currentGear = 0;
+        gearText.textContent = 'N';
+    } else if(e.key === 'R'){
+        currentGear = -1;
+        gearText.textContent = 'R';
+    }
+});
+
+// Mobile gear buttons (optional touch controls)
+const gearButtons = document.createElement('div');
+gearButtons.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 100;
+`;
+for(let i=0;i<=6;i++){
+    const btn = document.createElement('button');
+    btn.textContent = i===0?'N':i===6?'6':i;
+    btn.style.cssText = `
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #222;
+        color: #ffaa00;
+        border: 2px solid #333;
+        font-weight: bold;
+        cursor: pointer;
+    `;
+    btn.onclick = () => {
+        if(!running) return;
+        currentGear = i===0?0:i;
+        gearText.textContent = i===0?'N':i;
+        if(targetRpm > IDLE_RPM && i > 0){
+            targetRpm *= 0.7;
+        }
+    };
+    gearButtons.appendChild(btn);
+}
+document.body.appendChild(gearButtons);
+/* ---------- INITIALIZE ---------- */
+// Pre-warm audio context on touch
+document.body.addEventListener('touchstart', async () => {
+    if(ctx.state === 'suspended'){
+        await ctx.resume();
+    }
+}, {once: true});
+
+// Welcome message
+console.log(' FERRARI V12 SIMULATOR ', 'color: #ff2800; font-size: 18px; font-weight: bold;');
+console.log('%cHold button to rev • Use 1-6 keys to shift • Experience 789 HP!', 'color: #ffaa00;');
+</script>
+</body>
+</html>
